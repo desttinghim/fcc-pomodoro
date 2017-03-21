@@ -1,4 +1,5 @@
 -lib mithril
 -cp src/
+-main Pomodoro
 -js bin/js/app.js
 -cmd cp assets/index.html bin/index.html
