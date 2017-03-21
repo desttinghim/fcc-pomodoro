@@ -1,0 +1,4 @@
+-lib mithril
+-cp src/
+-js bin/js/app.js
+-cmd cp assets/index.html bin/index.html
