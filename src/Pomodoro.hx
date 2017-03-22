@@ -9,7 +9,10 @@ import js.Browser;
 }
 
 class Pomodoro implements Mithril {
-  // time in seconds
+
+  static function main() {M.mount(Browser.document.body, new Pomodoro(25, 5));}
+
+  // time in ms
   var currentTime : Float;
 
   var secondsTimer : Timer;
@@ -21,8 +24,8 @@ class Pomodoro implements Mithril {
   var state : PomodoroState;
 
   public function new(sessionTime, breakTime) {
-    this.sessionTime = new Spinner(sessionTime);
-    this.breakTime = new Spinner(breakTime);
+    this.sessionTime = new Spinner(sessionTime, "Session");
+    this.breakTime = new Spinner(breakTime, "Break");
     this.currentTime = 0;
     this.state = Paused;
     this.previousState = Paused;
@@ -70,26 +73,31 @@ class Pomodoro implements Mithril {
     Browser.document.title = '$str - Pomodoro';
   }
 
-  public function view() [
-    m('.spinner
-      display: inline-block;', {}, [m('p', {}, 'Session:'), m(sessionTime, {}),]),
-    m('.spinner
-      display: inline-block;', {}, [m('p', {}, 'Break:'), m(breakTime, {}),]),
-    m('p', {}, state),
-    m('.currentTime', {}, DateTools.format(Date.fromTime(currentTime ), "%M:%S")),
-    secondsTimer == null ? m('button', {onclick: start}, 'start')
-    : m('button', {onclick: stop}, 'stop'),
-  ];
+  static inline var btnStr = 'button.btn.col-xs-12';
+  function pauseOrPlay(){
+    return secondsTimer == null
+      ? m('${btnStr}.btn-success', {onclick: start}, 'start')
+      : m('${btnStr}.btn-danger', {onclick: stop}, 'stop');}
 
-  static function main() {M.mount(Browser.document.body, new Pomodoro(25, 5));}
+  public function view()
+    m('.pomodoro.container.col-xs-12', [
+      m(sessionTime),
+      m(breakTime),
+      m('p.center.col-xs-12', {}, state),
+      m('.currentTime.center.col-xs-12', {}, DateTools.format(Date.fromTime(currentTime ), "%M:%S")),
+      pauseOrPlay(),
+  ]); //view
+
 }
 
 class Spinner implements Mithril {
 
+  public var label : String;
   public var value(default, set) : Int;
 
-  public function new(value=0) {
+  public function new(value=0, label="") {
     this.value = value;
+    this.label = label;
   }
 
   public function set_value(newValue):Int {
@@ -97,11 +105,11 @@ class Spinner implements Mithril {
   }
 
   public function view() [
-    m('.spinner', {}, [
-      //TODO: propogate value changes back up to pomodoro
-      m('button', {onclick: function(e) value += 1}, '+'),
-      m('p', {}, value),
-      m('button', {onclick: function(e) {value -= 1;}}, '-'),
+    m('.spinner.col-xs-6', {}, [
+      m('p.center', label),
+      m('button.btn.col-xs-4', {onclick: function(e) {value -= 1;}}, '-'),
+      m('p.inline.col-xs-4', value),
+      m('button.btn.col-xs-4', {onclick: function(e) value += 1}, '+'),
     ]),
   ];
 

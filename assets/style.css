@@ -1,9 +1,34 @@
 
 body {
-  max-width: 320px;
+  max-width: 480px;
   margin: 10px auto;
+}
+
+.pomodoro {
+  font-size: 20pt;
 }
 
 .spinner {
   display: inline-block;
+  margin: 0 auto;
+}
+
+.spinner button {
+  display: inline-block;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.center {
+  text-align: center;
+}
+
+.state {
+  font-size: 24pt;
+}
+
+.currentTime {
+  font-size: 48pt;
 }
