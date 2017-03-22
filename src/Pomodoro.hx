@@ -50,6 +50,17 @@ class Pomodoro implements Mithril {
     secondsTimer = null;
   }
 
+  function reset() {
+    previousState = Paused;
+    state = Working;
+    setTitle(state);
+
+    currentTime = 0;
+    if (secondsTimer == null) return;
+    secondsTimer.stop();
+    secondsTimer = null;
+  }
+
   function update() {
     state = switch (state) {
       case Working if (currentTime > sessionTime.value * 60000): {
@@ -77,7 +88,7 @@ class Pomodoro implements Mithril {
   function pauseOrPlay(){
     return secondsTimer == null
       ? m('${btnStr}.btn-success', {onclick: start}, 'start')
-      : m('${btnStr}.btn-danger', {onclick: stop}, 'stop');}
+      : m('${btnStr}.btn-warning', {onclick: stop}, 'stop');}
 
   public function view()
     m('.pomodoro.container.col-xs-12', [
@@ -86,6 +97,7 @@ class Pomodoro implements Mithril {
       m('p.center.col-xs-12', {}, state),
       m('.currentTime.center.col-xs-12', {}, DateTools.format(Date.fromTime(currentTime ), "%M:%S")),
       pauseOrPlay(),
+      m('${btnStr}', {onclick: reset}, 'reset'),
   ]); //view
 
 }
