@@ -27,20 +27,28 @@ class Pomodoro implements Mithril {
   }
 
   function start() {
+    setTitle(state);
     if (secondsTimer != null) return;
     secondsTimer = new Timer(1000);
     secondsTimer.run = update;
   }
 
+  function stop() {
+    setTitle('Paused');
+    if (secondsTimer == null) return;
+    secondsTimer.stop();
+    secondsTimer = null;
+  }
+
   function update() {
     state = switch (state) {
       case Working if (currentTime > sessionTime.value * 60000): {
-        setTitle('Working');
+        setTitle('Break!');
         currentTime = 0;
         Break;
       }
       case Break if (currentTime > breakTime.value * 60000): {
-        setTitle('BREAK!');
+        setTitle('Working...');
         currentTime = 0;
         Working;
       }
@@ -50,7 +58,7 @@ class Pomodoro implements Mithril {
     M.redraw();
   }
 
-  function setTitle(str) {
+  function setTitle(str:Dynamic) {
     Browser.document.title = '$str - Pomodoro';
   }
 
@@ -59,7 +67,8 @@ class Pomodoro implements Mithril {
     m(breakTime, {}),
     m('p', {}, state),
     m('.currentTime', {}, DateTools.format(Date.fromTime(currentTime ), "%M:%S")),
-    m('button', {onclick: function(e) start()}, 'start'),
+    secondsTimer == null ? m('button', {onclick: start}, 'start')
+    : m('button', {onclick: stop}, 'stop'),
   ];
 
   static function main() {M.mount(Browser.document.body, new Pomodoro(25, 5));}
