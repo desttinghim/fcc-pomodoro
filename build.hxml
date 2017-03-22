@@ -1,5 +1,11 @@
+
 -lib mithril
+
+#TODO: figure out how to automatically include these files without build problems 
+
+-cmd cp assets/index.html bin/index.html
+-cmd cp assets/style.css bin/css/style.css
+
 -cp src/
 -main Pomodoro
 -js bin/js/app.js
--cmd cp assets/index.html bin/index.html
