@@ -3,8 +3,9 @@ import haxe.Timer;
 import js.Browser;
 
 @:enum abstract PomodoroState(String) from String {
-  var Working = "Working...";
+  var Working = "Working";
   var Break = "Break!";
+  var Paused = "Paused";
 }
 
 class Pomodoro implements Mithril {
@@ -16,17 +17,21 @@ class Pomodoro implements Mithril {
   var sessionTime : Spinner;
   var breakTime : Spinner;
 
+  var previousState : PomodoroState;
   var state : PomodoroState;
 
   public function new(sessionTime, breakTime) {
     this.sessionTime = new Spinner(sessionTime);
     this.breakTime = new Spinner(breakTime);
     this.currentTime = 0;
-    this.state = Working;
+    this.state = Paused;
+    this.previousState = Paused;
     this.secondsTimer = null;
   }
 
   function start() {
+    if (previousState == Paused) {state = Working;}
+    else {state = previousState;}
     setTitle(state);
     if (secondsTimer != null) return;
     secondsTimer = new Timer(1000);
@@ -34,7 +39,9 @@ class Pomodoro implements Mithril {
   }
 
   function stop() {
-    setTitle('Paused');
+    previousState = state;
+    state = Paused;
+    setTitle(state);
     if (secondsTimer == null) return;
     secondsTimer.stop();
     secondsTimer = null;
@@ -43,17 +50,18 @@ class Pomodoro implements Mithril {
   function update() {
     state = switch (state) {
       case Working if (currentTime > sessionTime.value * 60000): {
-        setTitle('Break!');
+        previousState = state;
         currentTime = 0;
         Break;
       }
       case Break if (currentTime > breakTime.value * 60000): {
-        setTitle('Working...');
+        previousState = state;
         currentTime = 0;
         Working;
       }
       default: state;
     }
+    setTitle(state);
     this.currentTime += 1000;
     M.redraw();
   }
@@ -63,8 +71,10 @@ class Pomodoro implements Mithril {
   }
 
   public function view() [
-    m(sessionTime, {}),
-    m(breakTime, {}),
+    m('.spinner
+      display: inline-block;', {}, [m('p', {}, 'Session:'), m(sessionTime, {}),]),
+    m('.spinner
+      display: inline-block;', {}, [m('p', {}, 'Break:'), m(breakTime, {}),]),
     m('p', {}, state),
     m('.currentTime', {}, DateTools.format(Date.fromTime(currentTime ), "%M:%S")),
     secondsTimer == null ? m('button', {onclick: start}, 'start')
