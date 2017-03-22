@@ -5,12 +5,18 @@ body {
 }
 
 .pomodoro {
-  font-size: 20pt;
+  font-size: 16pt;
+}
+
+.pomodoro h1 {
+  font-size: 50pt;
+  margin-bottom: 67px;
 }
 
 .spinner {
   display: inline-block;
   margin: 0 auto;
+  font-size: 16pt;
 }
 
 .spinner button {
@@ -26,9 +32,10 @@ body {
 }
 
 .state {
-  font-size: 24pt;
+  font-size: 21pt;
+  margin-top: 30px;
 }
 
 .currentTime {
-  font-size: 48pt;
+  font-size: 50pt;
 }

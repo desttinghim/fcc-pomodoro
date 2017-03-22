@@ -92,9 +92,10 @@ class Pomodoro implements Mithril {
 
   public function view()
     m('.pomodoro.container.col-xs-12', [
+      m('h1.center', 'Pomodoro'),
       m(sessionTime),
       m(breakTime),
-      m('p.center.col-xs-12', {}, state),
+      m('p.state.center.col-xs-12', {}, state),
       m('.currentTime.center.col-xs-12', {}, DateTools.format(Date.fromTime(currentTime ), "%M:%S")),
       pauseOrPlay(),
       m('${btnStr}', {onclick: reset}, 'reset'),
