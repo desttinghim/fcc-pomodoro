@@ -9,8 +9,9 @@ import js.Browser;
 
 class Pomodoro implements Mithril {
   // time in seconds
-  var startTime : Float;
   var currentTime : Float;
+
+  var secondsTimer : Timer;
   // spinner elements, store session/break time in minutes
   var sessionTime : Spinner;
   var breakTime : Spinner;
@@ -20,29 +21,45 @@ class Pomodoro implements Mithril {
   public function new(sessionTime, breakTime) {
     this.sessionTime = new Spinner(sessionTime);
     this.breakTime = new Spinner(breakTime);
-    this.startTime = Date.now().getTime();
-    this.currentTime = startTime;
+    this.currentTime = 0;
     this.state = Working;
-    var secondsTimer = new Timer(1000);
+    this.secondsTimer = null;
+  }
+
+  function start() {
+    if (secondsTimer != null) return;
+    secondsTimer = new Timer(1000);
     secondsTimer.run = update;
   }
 
   function update() {
-    var timeDelta = currentTime - startTime;
     state = switch (state) {
-      case Working if (timeDelta > sessionTime.value * 60000): {startTime = currentTime; Break;}
-      case Break if (timeDelta > breakTime.value * 60000): {startTime = currentTime; Working;}
+      case Working if (currentTime > sessionTime.value * 60000): {
+        setTitle('Working');
+        currentTime = 0;
+        Break;
+      }
+      case Break if (currentTime > breakTime.value * 60000): {
+        setTitle('BREAK!');
+        currentTime = 0;
+        Working;
+      }
       default: state;
     }
-    this.currentTime = Date.now().getTime();
+    this.currentTime += 1000;
     M.redraw();
+  }
+
+  function setTitle(str) {
+    Browser.document.title = '$str - Pomodoro';
   }
 
   public function view() [
     m(sessionTime, {}),
     m(breakTime, {}),
     m('p', {}, state),
-    m('.currentTime', {}, DateTools.format(Date.fromTime(currentTime - startTime), "%M:%S"))
+    m('.currentTime', {}, DateTools.format(Date.fromTime(currentTime ), "%M:%S")),
+    m('button', {onclick: function(e) start()}, 'start'),
   ];
 
   static function main() {M.mount(Browser.document.body, new Pomodoro(25, 5));}
@@ -63,9 +80,9 @@ class Spinner implements Mithril {
   public function view() [
     m('.spinner', {}, [
       //TODO: propogate value changes back up to pomodoro
-      m('button', {onclick: function(e) {value -= 1;}}, '-'),
-      m('p', {}, value),
       m('button', {onclick: function(e) value += 1}, '+'),
+      m('p', {}, value),
+      m('button', {onclick: function(e) {value -= 1;}}, '-'),
     ]),
   ];
 
